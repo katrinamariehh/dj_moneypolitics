@@ -1,6 +1,32 @@
-from django.db import models
+from django.db import models, DataError
+import csv
+from datetime import datetime
 
 # Create your models here.
+
+
+class CandidateManager(models.Manager):
+    def create_candidate_records(self, path):
+        with open(path) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='|')
+            for row in reader:
+                Cycle, FECCandId, CID, FirstLastP, Party, DistIdRunFor, \
+                    DistIdCurr, CurrCand, CycleCand, CRPICO, RecipCode, \
+                    NoPacs = row
+                candidate = Candidate(
+                    cycle=Cycle,
+                    fec_cand_id=FECCandId,
+                    cid=CID,
+                    first_last_p=FirstLastP,
+                    party=Party,
+                    dist_id_run_for=DistIdRunFor,
+                    dist_id_curr=DistIdCurr,
+                    curr_cand=CurrCand,
+                    cycle_cand=CycleCand,
+                    crpico=CRPICO,
+                    recip_code=RecipCode,
+                    no_pacs=NoPacs)
+                candidate.save()
 
 
 class Candidate(models.Model):
@@ -9,13 +35,60 @@ class Candidate(models.Model):
     cid = models.CharField(max_length=9)
     first_last_p = models.CharField(max_length=50)
     party = models.CharField(max_length=1)
-    dis_id_run_for = models.CharField(max_length=4)
-    dis_id_curr = models.CharField(max_length=4)
+    dist_id_run_for = models.CharField(max_length=4)
+    dist_id_curr = models.CharField(max_length=4)
     curr_cand = models.CharField(max_length=1)
     cycle_cand = models.CharField(max_length=1)
     crpico = models.CharField(max_length=1)
     recip_code = models.CharField(max_length=2)
     no_pacs = models.CharField(max_length=1)
+
+
+class CommitteeManager(models.Manager):
+    def create_committee_records(self, path):
+        with open(path) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='|')
+            for row in reader:
+                Cycle, CmteID, PACShort, Affiliate, Ultorg, RecipID, \
+                    RecipCode, FECCandID, Party, PrimCode, Source, \
+                    Sensitive, Foreign, Active = row
+                committee = Committee(
+                    cycle=Cycle,
+                    cmte_id=CmteID,
+                    pac_short=PACShort,
+                    affiliate=Affiliate,
+                    ultorg=Ultorg,
+                    recip_id=RecipID,
+                    recip_code=RecipCode,
+                    fec_cand_id=FECCandID,
+                    party=Party,
+                    prim_code=PrimCode,
+                    source=Source,
+                    sensitive=Sensitive,
+                    foreign=Foreign,
+                    active=Active
+                    )
+                try:
+                    committee.save()
+                # Maersk causes this problem
+                except UnicodeDecodeError:
+                    committee = Committee(
+                        cycle=Cycle,
+                        cmte_id=CmteID,
+                        pac_short=PACShort,
+                        affiliate=Affiliate,
+                        ultorg=PACShort,
+                        recip_id=RecipID,
+                        recip_code=RecipCode,
+                        fec_cand_id=FECCandID,
+                        party=Party,
+                        prim_code=PrimCode,
+                        source=Source,
+                        sensitive=Sensitive,
+                        foreign=Foreign,
+                        active=Active
+                        )
+                    committee.save()
 
 
 class Committee(models.Model):
@@ -29,10 +102,60 @@ class Committee(models.Model):
     fec_cand_id = models.CharField(max_length=9)
     party = models.CharField(max_length=1)
     prim_code = models.CharField(max_length=5)
-    source = models.CharField(max_length=5)
+    source = models.CharField(max_length=10)
     sensitive = models.CharField(max_length=1)
     foreign = models.CharField(max_length=1)
     active = models.IntegerField(max_length=1)
+
+
+class IndividualManager(models.Manager):
+    def create_individual_records(self, path):
+        with open(path) as f:
+            reader = csv.reader(f, delimiter=',', quotechar='|')
+            for row in reader:
+                Cycle, FECTransId, ContribID, Contrib, RecipID, \
+                    Orgname, UltOrg, RealCode, Date, Amount, \
+                    Street, City, State, Zip, RecipCode, Type, \
+                    CmteID, OtherID, Gender, Microfilm, Occupation, \
+                    Employer, Source = row
+                if Date == '':
+                    continue
+                Date = datetime.strptime(Date, "%m/%d/%Y")
+                try:
+                    Orgname.decode('utf8')
+                except UnicodeDecodeError:
+                    Orgname = ''
+                try:
+                    UltOrg.decode('utf8')
+                except UnicodeDecodeError:
+                    UltOrg = ''
+                individual = Individual(
+                    cycle=Cycle,
+                    fec_trans_id=FECTransId,
+                    contrib_id=ContribID,
+                    recip_id=RecipID,
+                    org_name=Orgname,
+                    ultorg=UltOrg,
+                    real_code=RealCode,
+                    date=Date,
+                    amount=Amount,
+                    street=Street,
+                    city=City,
+                    zip_code=Zip,
+                    recip_code=RecipCode,
+                    transaction_type=Type,
+                    cmte_id=CmteID,
+                    other_id=OtherID,
+                    gender=Gender,
+                    microfilm=Microfilm,
+                    occupation=Occupation,
+                    employer=Employer,
+                    source=Source
+                )
+                try:
+                    individual.save()
+                except UnicodeDecodeError:
+                    import pdb; pdb.set_trace()
 
 
 class Individual(models.Model):
@@ -44,8 +167,11 @@ class Individual(models.Model):
     org_name = models.CharField(max_length=50)
     ultorg = models.CharField(max_length=50, blank=True)
     real_code = models.CharField(max_length=5)
-    date = models.DateField()
+    date = models.DateField(blank=True)
     amount = models.IntegerField(max_length=30)
+    street = models.CharField(max_length=40)
+    city = models.CharField(max_length=30)
+    state = models.CharField(max_length=2)
     zip_code = models.CharField(max_length=5)
     recip_code = models.CharField(max_length=2)
     transaction_type = models.CharField(max_length=3)
