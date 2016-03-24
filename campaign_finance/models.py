@@ -112,23 +112,34 @@ class IndividualManager(models.Manager):
     def create_individual_records(self, path):
         with open(path) as f:
             reader = csv.reader(f, delimiter=',', quotechar='|')
+            counter = 0
             for row in reader:
-                Cycle, FECTransId, ContribID, Contrib, RecipID, \
-                    Orgname, UltOrg, RealCode, Date, Amount, \
-                    Street, City, State, Zip, RecipCode, Type, \
-                    CmteID, OtherID, Gender, Microfilm, Occupation, \
-                    Employer, Source = row
+                counter += 1
+                # if counter == 14352:
+                #     continue
+                # if counter <= 14300:
+                #     continue
+                try:
+                    Cycle, FECTransId, ContribID, Contrib, RecipID, \
+                        Orgname, UltOrg, RealCode, Date, Amount, \
+                        Street, City, State, Zip, RecipCode, Type, \
+                        CmteID, OtherID, Gender, Microfilm, Occupation, \
+                        Employer, Source = row
+                except UnicodeDecordError:
+                    import pdb; pdb.set_trace()
                 if Date == '':
                     continue
                 Date = datetime.strptime(Date, "%m/%d/%Y")
-                try:
-                    Orgname.decode('utf8')
-                except UnicodeDecodeError:
-                    Orgname = ''
-                try:
-                    UltOrg.decode('utf8')
-                except UnicodeDecodeError:
-                    UltOrg = ''
+                # try:
+                #     bytes = str.encode(Orgname)
+                #     bytes.decode('utf8')
+                # except UnicodeDecodeError:
+                #     Orgname = ''
+                # try:
+                #     bytes = str.encode(UltOrg)
+                #     bytes.decode('utf8')
+                # except UnicodeDecodeError:
+                #     UltOrg = ''
                 individual = Individual(
                     cycle=Cycle,
                     fec_trans_id=FECTransId,
@@ -154,8 +165,11 @@ class IndividualManager(models.Manager):
                 )
                 try:
                     individual.save()
-                except UnicodeDecodeError:
-                    import pdb; pdb.set_trace()
+                except (UnicodeDecodeError, ImportError):
+                    continue
+                if counter % 1000 == 0:
+                    print(counter)
+                # print(counter)
 
 
 class Individual(models.Model):
@@ -178,7 +192,7 @@ class Individual(models.Model):
     cmte_id = models.CharField(max_length=9)
     other_id = models.CharField(max_length=9)
     gender = models.CharField(max_length=1)
-    microfilm = models.CharField(max_length=11)
+    microfilm = models.CharField(max_length=20)
     occupation = models.CharField(max_length=50)
     employer = models.CharField(max_length=50)
     source = models.CharField(max_length=5)
