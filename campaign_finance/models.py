@@ -5,6 +5,61 @@ from datetime import datetime
 # Create your models here.
 
 
+class ContributionManager(models.Manager):
+    def create_contribution_records(self, path):
+        with open(path) as f:
+            reader = csv.reader(f, delimiter=',')
+            f.readline()
+            for row in reader:
+                try:
+                    Cycle, Fectransid, Contribid, Contrib, Recipid, \
+                        Orgname, Ultorg, Realcode, Date, Amount, \
+                        Street, City, State, Zip, Recipcode, Type, \
+                        CmteId, OtherID, Gender, Microfilm, \
+                        Occupation, Employer, Source = row
+                except ValueError:
+                    import pdb; pdb.set_trace()
+                contribution = Contribution(
+                    cycle=Cycle,
+                    contrib_id=Contribid,
+                    contrib=Contrib,
+                    recip_id=Recipid,
+                    org_name=Orgname,
+                    ult_org=Ultorg,
+                    real_code=Realcode,
+                    amount=Amount,
+                    recip_code=Recipcode,
+                    transaction_type=Type,
+                    cmte_id=CmteId,
+                    other_id=OtherID,
+                    occupation=Occupation,
+                    employer=Employer,
+                    source=Source
+                )
+                try:
+                    contribution.save()
+                except UnicodeDecodeError:
+                    continue
+
+
+class Contribution(models.Model):
+    cycle = models.IntegerField()
+    contrib_id = models.CharField(max_length=12)
+    contrib = models.CharField(max_length=50)
+    recip_id = models.CharField(max_length=9)
+    org_name = models.CharField(max_length=50)
+    ult_org = models.CharField(max_length=50, blank=True)
+    real_code = models.CharField(max_length=5)
+    amount = models.IntegerField()
+    recip_code = models.CharField(max_length=2)
+    transaction_type = models.CharField(max_length=3)
+    cmte_id = models.CharField(max_length=9)
+    other_id = models.CharField(max_length=9)
+    occupation = models.CharField(max_length=50)
+    employer = models.CharField(max_length=50)
+    source = models.CharField(max_length=5)
+
+
 class CandidateManager(models.Manager):
     def create_candidate_records(self, path):
         with open(path) as f:

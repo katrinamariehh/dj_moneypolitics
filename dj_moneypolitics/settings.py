@@ -36,7 +36,8 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'campaign_finance'
+    'campaign_finance',
+    'legislation'
 )
 
 MIDDLEWARE_CLASSES = (
