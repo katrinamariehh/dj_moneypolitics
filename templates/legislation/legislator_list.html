@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Legislators</h2>
+    <ul>
+        {% for legislator in object_list %}
+            <li>{{ legislator.first_name }} {{ legislator.last_name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Contributions</h2>
+    <ul>
+        {% for contribution in object_list %}
+            <li>{{ contribution.recip_id }} {{ contribution.amount }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
