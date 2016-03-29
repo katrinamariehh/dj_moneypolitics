@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Oil Contributions to Legislators</h2>
+    <ul>
+        {% for chamber in object_list %}
+        <h1>{{ chamber.name }}</h1>
+            {% for legislator in chamber.legislators %}
+                <li>{{ legislator.first_name }} {{ legislator.last_name }}: total contributions= {{ legislator.sum }}, {{ legislator.vote_value }}</li>
+            {% endfor %}
+        {% endfor %}
+    </ul>
+{% endblock %}
