@@ -85,7 +85,7 @@ class CandidateManager(models.Manager):
 
 
 class Candidate(models.Model):
-    cycle = models.IntegerField(max_length=4)
+    cycle = models.IntegerField()
     fec_cand_id = models.CharField(max_length=9)
     cid = models.CharField(max_length=9)
     first_last_p = models.CharField(max_length=50)
@@ -147,7 +147,7 @@ class CommitteeManager(models.Manager):
 
 
 class Committee(models.Model):
-    cycle = models.IntegerField(max_length=4)
+    cycle = models.IntegerField()
     cmte_id = models.CharField(max_length=9)
     pac_short = models.CharField(max_length=50)
     affiliate = models.CharField(max_length=50)
@@ -160,7 +160,7 @@ class Committee(models.Model):
     source = models.CharField(max_length=10)
     sensitive = models.CharField(max_length=1)
     foreign = models.CharField(max_length=1)
-    active = models.IntegerField(max_length=1)
+    active = models.IntegerField()
 
 
 class IndividualManager(models.Manager):
@@ -228,7 +228,7 @@ class IndividualManager(models.Manager):
 
 
 class Individual(models.Model):
-    cycle = models.IntegerField(max_length=4)
+    cycle = models.IntegerField()
     fec_trans_id = models.CharField(max_length=19)
     contrib_id = models.CharField(max_length=12)
     contrib = models.CharField(max_length=50)
@@ -237,7 +237,7 @@ class Individual(models.Model):
     ultorg = models.CharField(max_length=50, blank=True)
     real_code = models.CharField(max_length=5)
     date = models.DateField(blank=True)
-    amount = models.IntegerField(max_length=30)
+    amount = models.IntegerField()
     street = models.CharField(max_length=40)
     city = models.CharField(max_length=30)
     state = models.CharField(max_length=2)
@@ -254,7 +254,7 @@ class Individual(models.Model):
 
 
 class Pac(models.Model):
-    cycle = models.IntegerField(max_length=4)
+    cycle = models.IntegerField()
     fec_rec_no = models.CharField(max_length=19)
     pac_id = models.CharField(max_length=9)
     cid = models.CharField(max_length=9)
@@ -267,7 +267,7 @@ class Pac(models.Model):
 
 
 class PacToPac(models.Model):
-    cycle = models.IntegerField(max_length=4)
+    cycle = models.IntegerField()
     fec_rec_no = models.CharField(max_length=19)
     filer_id = models.CharField(max_length=8)
     donor_cmte = models.CharField(max_length=50)
